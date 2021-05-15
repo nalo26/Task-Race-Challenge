@@ -101,6 +101,7 @@ public class Race implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Game is not running!");
 			return false;
 		}
+		TimerTask.resetTimer();
 		this.main.randomChallengePick();
 		return true;
 	}
