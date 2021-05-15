@@ -48,6 +48,7 @@ public class TimerTask extends BukkitRunnable {
 	
 	private void updateBoard() {
 		List<String> sortedPlayers = this.sortPlayers();
+		sortedPlayers.add(0, ChatColor.GOLD + "Goal: " + ChatColor.RED + Main.pointsToWin);
 		for(FastBoard board : this.main.boards.values()) {
 			board.updateLines(sortedPlayers);
 		}

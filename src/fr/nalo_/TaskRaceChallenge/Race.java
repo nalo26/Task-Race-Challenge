@@ -20,7 +20,7 @@ public class Race implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
 		if(args.length < 1) {
-			help(sender, args);
+			help(sender);
 			return false;
 		}
 		
@@ -41,10 +41,10 @@ public class Race implements CommandExecutor {
 		}
 		
 		if(args[0].equalsIgnoreCase("targetScore")) {
-			return setTargetScore(sender, args);
+			return setGoalPoints(sender, args);
 		}
 		
-		help(sender, args);
+		help(sender);
 		return true;
 	}
 	
@@ -106,7 +106,7 @@ public class Race implements CommandExecutor {
 		return true;
 	}
 	
-	public boolean setTargetScore(CommandSender sender, String[] args) {
+	public boolean setGoalPoints(CommandSender sender, String[] args) {
 		try {
 			int score = Integer.parseInt(args[1]);
 			Main.setScoreToWin(score);
@@ -118,8 +118,16 @@ public class Race implements CommandExecutor {
 		return true;
 	}
 	
-	public void help(CommandSender sender, String[] args) {
-		sender.sendMessage(ChatColor.RED + "{ start [time] / pause / resume / skip / targetScore {score} } ?");
+	public void help(CommandSender sender) {
+		String msg = "";
+		msg += ChatColor.GOLD + "start [length] " + ChatColor.GRAY + "| Start the game (challenges last 'length' seconds (" + TimerTask.DEFAULT_TIMER_VALUE + "))";
+		msg += ChatColor.GOLD + "pause          " + ChatColor.GRAY + "| Pause the running game";
+		msg += ChatColor.GOLD + "resume         " + ChatColor.GRAY + "| Resume the paused game";
+		msg += ChatColor.GOLD + "skip           " + ChatColor.GRAY + "| Skip the current challenge";
+		msg += ChatColor.GOLD + "goal <score>   " + ChatColor.GRAY + "| Set the goal score to win to 'score'";
+		msg += ChatColor.GOLD + "help           " + ChatColor.GRAY + "| Print this message";
+
+		sender.sendMessage(msg);
 	}
 
 }
