@@ -120,10 +120,10 @@ public class Race implements CommandExecutor {
 	
 	public void help(CommandSender sender) {
 		String msg = "";
-		msg += ChatColor.GOLD + "start [length] " + ChatColor.GRAY + "| Start the game (challenges last 'length' seconds (" + TimerTask.DEFAULT_TIMER_VALUE + "))";
+		msg += ChatColor.GOLD + "start [length] " + ChatColor.GRAY + "| Start the game (tasks will last 'length' seconds (" + TimerTask.DEFAULT_TIMER_VALUE + "))";
 		msg += ChatColor.GOLD + "pause          " + ChatColor.GRAY + "| Pause the running game";
 		msg += ChatColor.GOLD + "resume         " + ChatColor.GRAY + "| Resume the paused game";
-		msg += ChatColor.GOLD + "skip           " + ChatColor.GRAY + "| Skip the current challenge";
+		msg += ChatColor.GOLD + "skip           " + ChatColor.GRAY + "| Skip the current task";
 		msg += ChatColor.GOLD + "goal <score>   " + ChatColor.GRAY + "| Set the goal score to win to 'score'";
 		msg += ChatColor.GOLD + "help           " + ChatColor.GRAY + "| Print this message";
 
