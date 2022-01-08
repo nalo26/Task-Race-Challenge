@@ -1,11 +1,13 @@
 package fr.nalo_.TaskRaceChallenge;
 
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -49,14 +51,24 @@ public class Race implements CommandExecutor {
 	}
 	
 	public boolean start(CommandSender sender, String[] args) {
-		Bukkit.getWorld("world").setTime(0);
+		World world = sender instanceof Player ? ((Player) sender).getWorld() : Bukkit.getWorld("world");
+		world.setTime(0);
+		world.setDifficulty(Difficulty.NORMAL);
 		
-		for(UUID player : this.main.players.keySet()) {
-			this.main.players.put(player, 0);
-			this.main.bossbar.addPlayer(Bukkit.getPlayer(player));
+		for(Player player : Bukkit.getOnlinePlayers()) {
+			this.main.players.put(player.getUniqueId(), 0);
+			this.main.bossbar.addPlayer(player);
+			player.setHealth(20.0);
+			player.setFoodLevel(20);
+			player.setSaturation(20);
+			player.setGameMode(GameMode.SURVIVAL);
+			player.setExp(0);
+			player.setLevel(0);
 		}
 		
 		this.main.getServer().dispatchCommand(this.main.getServer().getConsoleSender(), "advancement revoke @a everything");
+		this.main.getServer().dispatchCommand(this.main.getServer().getConsoleSender(), "clear @a");
+		this.main.getServer().dispatchCommand(this.main.getServer().getConsoleSender(), "gamerule doDaylightCycle true");
 		
 		this.main.randomChallengePick();
 		this.main.bossbar.setVisible(true);
@@ -80,6 +92,7 @@ public class Race implements CommandExecutor {
 			return false;
 		}
 		TimerTask.setRunning(false);
+		this.main.getServer().dispatchCommand(this.main.getServer().getConsoleSender(), "gamerule doDaylightCycle false");
 		this.main.bossbar.setTitle("-- PAUSED --");
 		Bukkit.broadcastMessage(ChatColor.RED + "---------- Game paused! ----------");
 		return true;
@@ -91,6 +104,7 @@ public class Race implements CommandExecutor {
 			return false;
 		}
 		TimerTask.setRunning(true);
+		this.main.getServer().dispatchCommand(this.main.getServer().getConsoleSender(), "gamerule doDaylightCycle true");
 		this.main.bossbar.setTitle(this.main.currentChallengeType + ": " + this.main.currentChallenge);
 		Bukkit.broadcastMessage(ChatColor.RED + "---------- Game resumed! ---------");
 		return true;
@@ -120,12 +134,12 @@ public class Race implements CommandExecutor {
 	
 	public void help(CommandSender sender) {
 		String msg = "";
-		msg += ChatColor.GOLD + "start [length]\t" + ChatColor.GRAY + "| Start the game (tasks will last 'length' seconds (" + TimerTask.DEFAULT_TIMER_VALUE + "))\n";
-		msg += ChatColor.GOLD + "pause\t\t"        + ChatColor.GRAY + "| Pause the running game\n";
-		msg += ChatColor.GOLD + "resume\t\t"       + ChatColor.GRAY + "| Resume the paused game\n";
-		msg += ChatColor.GOLD + "skip\t\t"         + ChatColor.GRAY + "| Skip the current task\n";
-		msg += ChatColor.GOLD + "goal <score>\t"   + ChatColor.GRAY + "| Set the goal score to win to 'score'\n";
-		msg += ChatColor.GOLD + "help\t\t"         + ChatColor.GRAY + "| Print this message\n";
+		msg += ChatColor.GOLD + "start [length]" + ChatColor.GRAY + " | Start the game (tasks will last 'length' seconds (" + TimerTask.DEFAULT_TIMER_VALUE + "))\n";
+		msg += ChatColor.GOLD + "pause"          + ChatColor.GRAY + " | Pause the running game\n";
+		msg += ChatColor.GOLD + "resume"         + ChatColor.GRAY + " | Resume the paused game\n";
+		msg += ChatColor.GOLD + "skip"           + ChatColor.GRAY + " | Skip the current task\n";
+		msg += ChatColor.GOLD + "goal <score>"   + ChatColor.GRAY + " | Set the goal score to win to 'score'\n";
+		msg += ChatColor.GOLD + "help"           + ChatColor.GRAY + " | Print this message\n";
 
 		sender.sendMessage(msg);
 	}

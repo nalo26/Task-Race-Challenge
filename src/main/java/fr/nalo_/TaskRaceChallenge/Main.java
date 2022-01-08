@@ -21,10 +21,11 @@ import fr.nalo_.ChallengesEnum.Advancements;
 import fr.nalo_.ChallengesEnum.Deaths;
 import fr.nalo_.ChallengesEnum.Kills;
 import fr.nalo_.Scoreboard.FastBoard;
+import net.md_5.bungee.api.ChatColor;
 
 public class Main extends JavaPlugin {
 	
-	public static int pointsToWin = 10;
+	public static int pointsToWin = 5;
 
 	public final Map<UUID, FastBoard> boards = new HashMap<>();
 	public final Map<UUID, Integer> players = new HashMap<>();
@@ -91,9 +92,9 @@ public class Main extends JavaPlugin {
 		this.currentChallengeType = chalType;
 		this.currentChallenge = chal;
 		
-		// TODO: print on chat
 		String text = this.currentChallengeType + ": " + this.currentChallenge;
 		this.bossbar.setTitle(text);
+		Bukkit.broadcastMessage(ChatColor.YELLOW + text);
 	}
 	
 	public boolean isValid(String chalType, String chal) {

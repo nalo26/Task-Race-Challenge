@@ -1,5 +1,5 @@
 name: TaskRaceChallenge
-version: 1.8
+version: 1.9
 api-version: 1.13
 authot: nalo_
 main: fr.nalo_.TaskRaceChallenge.Main

@@ -3,6 +3,7 @@ package fr.nalo_.TaskRaceChallenge;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Entity;
@@ -12,11 +13,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 import fr.nalo_.ChallengesEnum.Advancements;
 import fr.nalo_.ChallengesEnum.Deaths;
@@ -42,7 +46,9 @@ public class EventListener implements Listener {
 		
 		this.main.boards.put(player_uuid, board);
 		this.main.bossbar.addPlayer(player);
-		if(this.main.players.get(player_uuid) == null) this.main.players.put(player_uuid, 0);
+		if(TimerTask.RUN && !this.main.players.containsKey(player.getUniqueId())) {
+			player.setGameMode(GameMode.SPECTATOR);
+		}
 	}
 
 	@EventHandler
@@ -105,8 +111,23 @@ public class EventListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onInventoryPickUpItem(EntityPickupItemEvent e) {
+	public void onInventoryClick(InventoryClickEvent e) {
 		// ITEM -------------------------------------------------------------------------------------
+		Player player = (Player) e.getWhoClicked();
+		ItemStack item = e.getCurrentItem();
+		if(item == null) return;
+		Material material = item.getType();
+
+		if(!TimerTask.RUN) return;
+		if(!this.main.currentChallengeType.equalsIgnoreCase("Item")) return;
+		if(material.equals(Material.valueOf(this.main.currentChallenge.toUpperCase()))) {
+			this.main.addPlayerPoint(player);
+		}
+
+	}
+
+	@EventHandler
+	public void onInventoryPickUpItem(EntityPickupItemEvent e) {
 		EntityType entity = e.getEntityType();
 		Item item = e.getItem();
 		Material material = item.getItemStack().getType();
@@ -121,6 +142,17 @@ public class EventListener implements Listener {
 			this.main.addPlayerPoint(player);
 		}
 		
+	}
+
+	@EventHandler
+	public void onDamage(EntityDamageEvent e) {
+		EntityType entity = e.getEntityType();
+
+		if(TimerTask.RUN) return;
+		if(!entity.equals(EntityType.PLAYER)) return;
+
+		e.setDamage(0.0);
+		e.setCancelled(true);
 	}
 }
  
