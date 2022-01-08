@@ -86,12 +86,12 @@ public class Main extends JavaPlugin {
 			valid = isValid(chalType, chal);
 		}
 		
-		// TODO delete from list when done
+		// TODO: delete from list when done
 		
 		this.currentChallengeType = chalType;
 		this.currentChallenge = chal;
 		
-		// TODO print on chat
+		// TODO: print on chat
 		String text = this.currentChallengeType + ": " + this.currentChallenge;
 		this.bossbar.setTitle(text);
 	}
