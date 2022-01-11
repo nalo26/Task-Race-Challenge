@@ -1,12 +1,15 @@
 package fr.nalo_.TaskRaceChallenge;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -59,6 +62,9 @@ public class Main extends JavaPlugin {
 		for(UUID uuid : this.players.keySet()) {
 			Bukkit.getPlayer(uuid).sendTitle(player.getDisplayName() + " won a point!", "", 10, 5 * 20, 10);
 		}
+
+		this.challenges.get(this.currentChallengeType).remove(this.currentChallenge);
+		this.updateBoard(true);
 		
 		if(score >= pointsToWin) {
 			TimerTask.setRunning(false);
@@ -71,7 +77,6 @@ public class Main extends JavaPlugin {
 		}
 		
 		this.randomChallengePick();
-		TimerTask.resetTimer();
 	}
 	
 	public void randomChallengePick() {
@@ -87,14 +92,14 @@ public class Main extends JavaPlugin {
 			valid = isValid(chalType, chal);
 		}
 		
-		// TODO: delete from list when done
-		
 		this.currentChallengeType = chalType;
 		this.currentChallenge = chal;
 		
 		String text = this.currentChallengeType + ": " + this.currentChallenge;
 		this.bossbar.setTitle(text);
 		Bukkit.broadcastMessage(ChatColor.YELLOW + text);
+
+		TimerTask.resetTimer();
 	}
 	
 	public boolean isValid(String chalType, String chal) {
@@ -103,7 +108,9 @@ public class Main extends JavaPlugin {
 		
 		if(chalType.equals("Item")) {
 			for(UUID uuid : this.players.keySet()) {
-				if(Bukkit.getPlayer(uuid).getInventory().contains(Material.valueOf(chal.toUpperCase()))) return false;
+				Player player = Bukkit.getPlayer(uuid);
+				if(!player.isOnline()) continue;
+				if(player.getInventory().contains(Material.valueOf(chal.toUpperCase()))) return false;
 			}
 			return true;
 		}
@@ -111,7 +118,9 @@ public class Main extends JavaPlugin {
 		if(chalType.equals("Advancement")) {
 			Advancement adv = getAdvancement(chal);
 			for(UUID uuid : this.players.keySet()) {
-				if(Bukkit.getPlayer(uuid).getAdvancementProgress(adv).isDone()) return false;
+				Player player = Bukkit.getPlayer(uuid);
+				if(!player.isOnline()) continue;
+				if(player.getAdvancementProgress(adv).isDone()) return false;
 			}
 			return true;
 		}
@@ -159,6 +168,40 @@ public class Main extends JavaPlugin {
 		}
 		this.challenges.put("Kill", kills);
 		
+	}
+
+	public void updateBoard(boolean updatePlayer) {
+		if(!updatePlayer) {
+			for(FastBoard board : this.boards.values()) {
+				board.updateLine(0, ChatColor.YELLOW + TimerTask.formatTime(TimerTask.timeSpent));
+				board.updateLine(1, ChatColor.GOLD + "Goal: " + ChatColor.RED + Main.pointsToWin);
+			}
+			return;
+		}
+		List<String> sortedPlayers = this.sortPlayers();
+		sortedPlayers.add(0, ChatColor.YELLOW + TimerTask.formatTime(TimerTask.timeSpent));
+		sortedPlayers.add(1, ChatColor.GOLD + "Goal: " + ChatColor.RED + Main.pointsToWin);
+		for(FastBoard board : this.boards.values()) {
+			board.updateLines(sortedPlayers);
+		}		
+	}
+
+	private List<String> sortPlayers() {
+		Map<UUID, Integer> sortedMap = this.players.entrySet()
+				.stream()
+				.sorted(Map.Entry.comparingByValue())
+				.collect(Collectors.toMap(
+						Map.Entry::getKey, 
+						Map.Entry::getValue, 
+						(oldValue, newValue) -> oldValue, LinkedHashMap::new));
+		
+		List<String> result = new ArrayList<>();
+		for(Map.Entry<UUID, Integer> entry : sortedMap.entrySet()) {
+			String player = Bukkit.getOfflinePlayer(entry.getKey()).getName();
+			result.add(ChatColor.WHITE + player + ChatColor.GRAY + ": " + ChatColor.GREEN + entry.getValue());
+		}
+		Collections.reverse(result);
+		return result;
 	}
 
 }

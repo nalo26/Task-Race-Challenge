@@ -1,7 +1,6 @@
 package fr.nalo_.TaskRaceChallenge;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -53,7 +52,6 @@ public class Race implements CommandExecutor {
 	public boolean start(CommandSender sender, String[] args) {
 		World world = sender instanceof Player ? ((Player) sender).getWorld() : Bukkit.getWorld("world");
 		world.setTime(0);
-		world.setDifficulty(Difficulty.NORMAL);
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			this.main.players.put(player.getUniqueId(), 0);
@@ -69,6 +67,7 @@ public class Race implements CommandExecutor {
 		this.main.getServer().dispatchCommand(this.main.getServer().getConsoleSender(), "advancement revoke @a everything");
 		this.main.getServer().dispatchCommand(this.main.getServer().getConsoleSender(), "clear @a");
 		this.main.getServer().dispatchCommand(this.main.getServer().getConsoleSender(), "gamerule doDaylightCycle true");
+		this.main.getServer().dispatchCommand(this.main.getServer().getConsoleSender(), "difficulty normal"); // world.setDifficulty is making no mob spawn?
 		
 		this.main.randomChallengePick();
 		this.main.bossbar.setVisible(true);

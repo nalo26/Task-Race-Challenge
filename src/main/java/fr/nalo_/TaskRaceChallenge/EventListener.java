@@ -49,6 +49,9 @@ public class EventListener implements Listener {
 		if(TimerTask.RUN && !this.main.players.containsKey(player.getUniqueId())) {
 			player.setGameMode(GameMode.SPECTATOR);
 		}
+		if(!TimerTask.RUN && this.main.currentChallenge == null) {
+			player.setGameMode(GameMode.ADVENTURE);
+		}
 	}
 
 	@EventHandler
